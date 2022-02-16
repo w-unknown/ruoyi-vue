@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysDemoMapper">
+    <!--<select id="getSysDemoList" parameterType="SysDemo" resultType="SysDemo">
+        select * from sys_demo
+        <where>
+            <if test="field!=null and field!=''">
+            <if test="${field}!=null and ${field}!=''">
+                ${field}=#{${field}}
+            </if>
+            </if>
+        </where>
+    </select>-->
+    <resultMap id="sysDemoList" type="SysDemo">
+        <id column="id" property="id"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="number" property="number"/>
+        <result column="company" property="company"/>
+    </resultMap>
+    <select id="getSysDemoList" parameterType="SysDemo" resultMap="sysDemoList">
+        select id,province,city,number,company from sys_demo
+        <where>
+            <if test="id!=null and id>=0">
+                id=#{id}
+            </if>
+            <if test="province!=null and province!=''">
+                 province=#{province}
+            </if>
+            <if test="city!=null and city!=''">
+                city=#{city}
+            </if>
+            <if test="number!=null and number>=0">
+                number &gt;= #{number}
+            </if>
+            <if test="company!=null and company!=''">
+                company=#{company}
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="demoVo" type="DemoVo">
+        <result column="fieldValue" property="fieldValue"/>
+        <result column="sum" property="sum"/>
+        <result column="comment" property="comment"/>
+    </resultMap>
+
+    <select id="groupByField" resultMap="demoVo">
+            select ${field} fieldValue,sum(number) sum
+            from
+            (select id,province,city,number,company from sys_demo
+            <where>
+                <if test="id!=null and id>=0">
+                    id=#{id}
+                </if>
+                <if test="province!=null and province!=''">
+                    province=#{province}
+                </if>
+                <if test="city!=null and city!=''">
+                        city=#{city}
+                </if>
+                <if test="number!=null and number>=0">
+                    number &gt;= #{number}
+                </if>
+                <if test="company!=null and company!=''">
+                    company=#{company}
+                </if>
+            </where>) t
+            group by ${field} order by ${field}
+    </select>
+
+    <select id="getSysDemoFields" parameterType="String" resultMap="demoVo">
+        select column_name fieldValue,column_comment comment
+        from information_schema.columns
+        where
+        table_name='sys_demo' and table_schema='ry-vue'
+        <if test="comment!='' and comment!=null">
+            and column_comment like concat('%',#{comment},'%')
+        </if>
+    </select>
+</mapper>
