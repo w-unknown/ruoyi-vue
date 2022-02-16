@@ -76,7 +76,7 @@
         //获取select中的label得值
         let obj = {};
         obj = this.project.find((item)=>{//遍历list的数据
-          return item.value === this.value;//筛选出匹配数据
+          return item.value === value;//筛选出匹配数据
         });
         console.log(obj.label);
         this.fieldName=obj.label;
@@ -84,17 +84,9 @@
       },
       getEchartsData(project) {
         getSysGradeByProject(this.value).then(response => {
-          console.log()
-          console.log(response.rows)
           response.rows.forEach((value,index)=>{
-            console.log(value)
-            console.log(value[project])
-            console.log(index)
             this.names[index]=value['name'];
             this.fieldValues[index]=value[project];
-            console.log(this.names)
-            console.log(this.fieldValues)
-            console.log(this.fieldName)
           })
           this.drawLine()
         })

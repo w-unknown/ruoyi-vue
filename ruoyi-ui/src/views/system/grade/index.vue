@@ -149,45 +149,6 @@
               ></el-switch>
             </template>
           </el-table-column>
-          <!--<el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" width="160">
-            <template slot-scope="scope">
-              <span>{{ parseTime(scope.row.createTime) }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="操作"
-            align="center"
-            width="160"
-            class-name="small-padding fixed-width"
-          >
-            <template slot-scope="scope" v-if="scope.row.userId !== 1">
-              <el-button
-                size="mini"
-                type="text"
-                icon="el-icon-edit"
-                @click="handleUpdate(scope.row)"
-                v-hasPermi="['system:user:edit']"
-              >修改</el-button>
-              <el-button
-                size="mini"
-                type="text"
-                icon="el-icon-delete"
-                @click="handleDelete(scope.row)"
-                v-hasPermi="['system:user:remove']"
-              >删除</el-button>
-              <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['system:user:resetPwd', 'system:user:edit']">
-                <span class="el-dropdown-link">
-                  <i class="el-icon-d-arrow-right el-icon--right"></i>更多
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="handleResetPwd" icon="el-icon-key"
-                                    v-hasPermi="['system:user:resetPwd']">重置密码</el-dropdown-item>
-                  <el-dropdown-item command="handleAuthRole" icon="el-icon-circle-check"
-                                    v-hasPermi="['system:user:edit']">分配角色</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </template>
-          </el-table-column>-->
         </el-table>
 
         <pagination
@@ -263,90 +224,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <!--<el-row>
-          <el-col :span="12">
-            <el-form-item label="手机号码" prop="phonenumber">
-              <el-input v-model="form.phonenumber" placeholder="请输入手机号码" maxlength="11" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="邮箱" prop="email">
-              <el-input v-model="form.email" placeholder="请输入邮箱" maxlength="50" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item v-if="form.userId == undefined" label="用户名称" prop="userName">
-              <el-input v-model="form.userName" placeholder="请输入用户名称" maxlength="30" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item v-if="form.userId == undefined" label="用户密码" prop="password">
-              <el-input v-model="form.password" placeholder="请输入用户密码" type="password" maxlength="20" show-password/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="用户性别">
-              <el-select v-model="form.sex" placeholder="请选择">
-                <el-option
-                  v-for="dict in dict.type.sys_user_sex"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="状态">
-              <el-radio-group v-model="form.status">
-                <el-radio
-                  v-for="dict in dict.type.sys_normal_disable"
-                  :key="dict.value"
-                  :label="dict.value"
-                >{{dict.label}}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="岗位">
-              <el-select v-model="form.postIds" multiple placeholder="请选择">
-                <el-option
-                  v-for="item in postOptions"
-                  :key="item.postId"
-                  :label="item.postName"
-                  :value="item.postId"
-                  :disabled="item.status == 1"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="角色">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择">
-                <el-option
-                  v-for="item in roleOptions"
-                  :key="item.roleId"
-                  :label="item.roleName"
-                  :value="item.roleId"
-                  :disabled="item.status == 1"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="备注">
-              <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>-->
       </el-form>
       <div slot="footer" class="dialog-footer" style="text-align: center">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -521,10 +398,6 @@
       };
     },
     watch: {
-      // 根据名称筛选部门树
-      /*deptName(val) {
-        this.$refs.tree.filter(val);
-      }*/
       form(val){
         console.log(val)
       }
@@ -583,22 +456,6 @@
         });
         return sums;
       },
-      /** 查询部门下拉树结构 */
-      /*getTreeselect() {
-        treeselect().then(response => {
-          this.deptOptions = response.data;
-        });
-      },*/
-      // 筛选节点
-      /*filterNode(value, data) {
-        if (!value) return true;
-        return data.label.indexOf(value) !== -1;
-      },*/
-      // 节点单击事件
-      /*handleNodeClick(data) {
-        this.queryParams.deptId = data.id;
-        this.handleQuery();
-      },*/
       // 用户状态修改
       handleStatusChange(row) {
         console.log(row)
@@ -650,19 +507,6 @@
         this.single = selection.length != 1;
         this.multiple = !selection.length;
       },
-      // 更多操作触发
-      /*handleCommand(command, row) {
-        switch (command) {
-          case "handleResetPwd":
-            this.handleResetPwd(row);
-            break;
-          case "handleAuthRole":
-            this.handleAuthRole(row);
-            break;
-          default:
-            break;
-        }
-      },*/
       /** 新增按钮操作 */
       handleAdd() {
         this.reset();
@@ -670,12 +514,7 @@
         this.read=false;
         this.open = true;
         this.title = "添加学生成绩";
-        /*getUser().then(response => {
-          /!*this.postOptions = response.posts;
-          this.roleOptions = response.roles;*!/
 
-          /!*this.form.password = this.initPassword;*!/
-        });*/
       },
       /** 修改按钮操作 */
       handleUpdate(row) {
@@ -689,25 +528,6 @@
           this.title = "修改学生成绩";
         });
       },
-      /** 重置密码按钮操作 */
-      /*handleResetPwd(row) {
-        this.$prompt('请输入"' + row.userName + '"的新密码', "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          closeOnClickModal: false,
-          inputPattern: /^.{5,20}$/,
-          inputErrorMessage: "用户密码长度必须介于 5 和 20 之间"
-        }).then(({ value }) => {
-          resetUserPwd(row.userId, value).then(response => {
-            this.$modal.msgSuccess("修改成功，新密码是：" + value);
-          });
-        }).catch(() => {});
-      },*/
-      /** 分配角色操作 */
-      /*handleAuthRole: function(row) {
-        const userId = row.userId;
-        this.$router.push("/system/user-auth/role/" + userId);
-      },*/
       /** 提交按钮 */
       submitForm: function() {
         this.$refs["form"].validate(valid => {

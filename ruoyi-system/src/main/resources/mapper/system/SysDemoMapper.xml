@@ -27,16 +27,16 @@
                 id=#{id}
             </if>
             <if test="province!=null and province!=''">
-                 province=#{province}
+                and province=#{province}
             </if>
             <if test="city!=null and city!=''">
-                city=#{city}
+                and city=#{city}
             </if>
             <if test="number!=null and number>=0">
-                number &gt;= #{number}
+                and number &gt;= #{number}
             </if>
             <if test="company!=null and company!=''">
-                company=#{company}
+                and company=#{company}
             </if>
         </where>
     </select>
@@ -56,16 +56,16 @@
                     id=#{id}
                 </if>
                 <if test="province!=null and province!=''">
-                    province=#{province}
+                    and province=#{province}
                 </if>
                 <if test="city!=null and city!=''">
-                        city=#{city}
+                    and city=#{city}
                 </if>
                 <if test="number!=null and number>=0">
-                    number &gt;= #{number}
+                    and number &gt;= #{number}
                 </if>
                 <if test="company!=null and company!=''">
-                    company=#{company}
+                    and company=#{company}
                 </if>
             </where>) t
             group by ${field} order by ${field}
