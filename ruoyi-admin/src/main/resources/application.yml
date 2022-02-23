@@ -121,3 +121,11 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+#es配置
+elastic-search:
+  host:
+    port: 120.76.204.113:9200
+  #    Socket连接超时时间
+  socket-timeout: 6000
+  #  连接超时时间
+  connection-timeout: 3000
