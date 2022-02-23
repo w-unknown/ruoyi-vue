@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysMyFileMapper">
+    <select id="getFileList" resultType="MyFileVo">
+        select name,path,status,parentId,modTime,creTime,delTime,extend_Name extendName,type_name typeName,size
+        from
+        (select pro_name name,pro_path path,pro_status status,pro_parent_id parentId,mod_time modTime,cre_time creTime,del_time delTime,extend_id extendId,pro_size size from sys_protfolio
+        union all
+        select file_name name,file_path path,file_status status,pro_id parentId,mod_time modTime,cre_time creTime,del_time delTime,extend_id extendId,file_size size from sys_file) t
+        left join sys_extend b on t.extendId=b.extend_id
+        left join sys_type c on b.type_id=c.type_id
+        <where>
+            status='1'
+            <if test="name!=null and name!=''">
+                and name=#{name}
+            </if>
+            <if test="path!=null and path!=''">
+                and path=#{path}
+            </if>
+        </where>
+    </select>
+</mapper>
