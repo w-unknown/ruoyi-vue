@@ -1,119 +1,83 @@
 package com.ruoyi.system.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.util.Date;
 
 /**
  * 文件和文件夹信息工具类
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
+@Document(indexName = "t_file")
 public class MyFileVo {
-    //名称
+
+    /**
+     * 编号
+     */
+    @Field(name = "id")
+    private String id;
+    /**
+     * 文件名
+     */
+    @Field(name="name")
     private String name;
-    //状态
-    private String status;
-    //路径
+    /**
+     * 文件路径
+     */
+    @Field(name = "path")
     private String path;
-    //修改日期
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    /**
+     * 文件状态（1为正常，0为删除）
+     */
+    @Field(name="status")
+    private String status;
+    /**
+     * 上级目录
+     */
+    @Field(name = "parentId")
+    private Integer parentId;
+    /**
+     * 修改日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-DD HH:mm:ss")
+    @Field(name = "modTime")
     private Date modTime;
-    //创建日期
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    /**
+     * 创建日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-DD HH:mm:ss")
+    @Field(name = "creTime")
     private Date creTime;
-    //删除日期
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    /**
+     * 删除日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-DD HH:mm:ss")
+    @Field(name = "delTime")
     private Date delTime;
-    //扩展名
+    /**
+     * 扩展名
+     */
+    @Field(name = "extendName")
     private String extendName;
-    //类型名称
+    /**
+     * 类型名
+     */
+    @Field(name = "typeName")
     private String typeName;
-    //文件大小
+    /**
+     * 文件大小
+     */
+    @Field(name = "size")
     private Integer size;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public Date getModTime() {
-        return modTime;
-    }
-
-    public void setModTime(Date modTime) {
-        this.modTime = modTime;
-    }
-
-    public Date getCreTime() {
-        return creTime;
-    }
-
-    public void setCreTime(Date creTime) {
-        this.creTime = creTime;
-    }
-
-    public Date getDelTime() {
-        return delTime;
-    }
-
-    public void setDelTime(Date delTime) {
-        this.delTime = delTime;
-    }
-
-    public String getExtendName() {
-        return extendName;
-    }
-
-    public void setExtendName(String extendName) {
-        this.extendName = extendName;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    public Integer getSize() {
-        return size;
-    }
-
-    public void setSize(Integer size) {
-        this.size = size;
-    }
-
-    @Override
-    public String toString() {
-        return "FileVo{" +
-                "name='" + name + '\'' +
-                ", status='" + status + '\'' +
-                ", path='" + path + '\'' +
-                ", modTime=" + modTime +
-                ", creTime=" + creTime +
-                ", delTime=" + delTime +
-                ", extendName='" + extendName + '\'' +
-                ", typeName='" + typeName + '\'' +
-                ", size=" + size +
-                '}';
-    }
 }

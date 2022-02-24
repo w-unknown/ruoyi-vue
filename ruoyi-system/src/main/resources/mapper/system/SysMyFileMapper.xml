@@ -3,22 +3,237 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysMyFileMapper">
-    <select id="getFileList" resultType="MyFileVo">
-        select name,path,status,parentId,modTime,creTime,delTime,extend_Name extendName,type_name typeName,size
+    <resultMap id="myFileVoList" type="MyFileVo">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="path" property="path"/>
+        <result column="status" property="status"/>
+        <result column="parentId" property="parentId"/>
+        <result column="modTime" property="modTime"/>
+        <result column="creTime" property="creTime"/>
+        <result column="delTime" property="delTime"/>
+        <result column="extendName" property="extendName"/>
+        <result column="typeName" property="typeName"/>
+        <result column="size" property="size"/>
+        <result column="id" property="id"/>
+    </resultMap>
+
+    <select id="getFileVoList" resultMap="myFileVoList">
+        select id,name,path,status,parentId,modTime,creTime,delTime,extend_Name extendName,type_name typeName,size
         from
-        (select pro_name name,pro_path path,pro_status status,pro_parent_id parentId,mod_time modTime,cre_time creTime,del_time delTime,extend_id extendId,pro_size size from sys_protfolio
+        (select pro_id id,pro_name name,pro_path path,pro_status status,pro_parent_id parentId,mod_time modTime,cre_time
+        creTime,del_time delTime,extend_id extendId,pro_size size from sys_protfolio
         union all
-        select file_name name,file_path path,file_status status,pro_id parentId,mod_time modTime,cre_time creTime,del_time delTime,extend_id extendId,file_size size from sys_file) t
+        select file_id id,file_name name,file_path path,file_status status,pro_id parentId,mod_time modTime,cre_time
+        creTime,del_time delTime,extend_id extendId,file_size size from sys_file) t
         left join sys_extend b on t.extendId=b.extend_id
         left join sys_type c on b.type_id=c.type_id
         <where>
             status='1'
+            <if test="id!>-1">
+                and id=#{id}
+            </if>
             <if test="name!=null and name!=''">
                 and name=#{name}
             </if>
             <if test="path!=null and path!=''">
                 and path=#{path}
             </if>
+            <if test="parentId!>-1">
+                and parentId=#{parentId}
+            </if>
+            <if test="modTime!=null and modTime!=''">
+                and modTime=#{modTime}
+            </if>
+            <if test="creTime!=null and creTime!=''">
+                and creTime=#{creTime}
+            </if>
+            <if test="delTime!=null and delTime!=''">
+                and modTime=#{modTime}
+            </if>
+            <if test="extendName!=null and extendName!=''">
+                and extendName=#{extendName}
+            </if>
+            <if test="typeName!=null and typeName!=''">
+                and typeName=#{typeName}
+            </if>
+            <if test="size>-1">
+                and size=#{size}
+            </if>
         </where>
     </select>
+
+    <!--统计某文件大小-->
+    <select id="getDownFileOrProSumSize" parameterType="String">
+        select name,path,sum(size) size
+        from
+        (select pro_id id,pro_name name,pro_path path,pro_status status,pro_size size from sys_protfolio
+        union all
+        select file_id id,file_name name,file_path path,file_status status,file_size size from sys_file) t
+        where
+        status='1' and
+        path like concat('/','file','%')
+
+    </select>
+
+    <!--查询后缀名信息-->
+    <select id="getExtendList" resultType="SysMyFileExtend">
+        select extend_name extendName from sys_extend
+        <where>
+            <if test="extendId >-1">
+                extend_id=#{extendId}
+            </if>
+            <if test="extendName !=null and extendName!=''">
+                extend_name=#{extendName}
+            </if>
+        </where>
+    </select>
+
+    <!--新增文件-->
+    <insert id="addFile" parameterType="SysMyFile">
+        insert into sys_file(
+        file_name,file_status,file_path,pro_id
+        <if test="modTime!=null and modTime!=''">
+            ,mod_time
+        </if>
+        <if test="creTime!=null and creTime!=''">
+            ,cre_time
+        </if>
+        <if test="delTime!=null and delTime!=''">
+            ,del_time
+        </if>
+        ,extend_id,file_size
+        )
+        values(
+        #{fileName},#{fileStatus},#{filePath},#{proId}
+        <if test="modTime!=null and modTime!=''">
+            ,#{modTime}
+        </if>
+        <if test="creTime!=null and creTime!=''">
+            ,#{creTime}
+        </if>
+        <if test="delTime!=null and delTime!=''">
+            ,#{delTime}
+        </if>
+        ,#{extendId},#{fileSize}
+        )
+    </insert>
+
+    <!--新增文件夹-->
+    <insert id="addProtfolio" parameterType="SysProtfolio">
+        insert into sys_protfolio(
+        pro_name,pro_status,pro_path,pro_parent_id
+        <if test="modTime!=null and modTime!=''">
+            ,mod_time
+        </if>
+        <if test="creTime!=null and creTime!=''">
+            ,cre_time
+        </if>
+        <if test="delTime!=null and delTime!=''">
+            ,del_time
+        </if>
+        ,extend_id,file_size
+        )
+        values(
+        #{proName},#{proStatus},#{proPath},#{proParentId}
+        <if test="modTime!=null and modTime!=''">
+            ,#{modTime}
+        </if>
+        <if test="creTime!=null and creTime!=''">
+            ,#{creTime}
+        </if>
+        <if test="delTime!=null and delTime!=''">
+            ,#{delTime}
+        </if>
+        ,#{extendId},#{proSize}
+        )
+    </insert>
+
+    <!--修改文件-->
+    <update id="editFile" parameterType="SysMyFile">
+        update sys_file
+        <set>
+            <if test="fileName!=null and fileName!=''">
+                file_name=#{fileName},
+            </if>
+            <if test="fileStatus!=null and fileStatus!=''">
+                file_status=#{fileStatus},
+            </if>
+            <if test="filePath!=null and filePath!=''">
+                file_path=#{filePath},
+            </if>
+            <if test="proId>-1">
+                pro_id=#{proId},
+            </if>
+            <if test="modTime!=null and modTime!=''">
+                mod_time=#{modTime},
+            </if>
+            <if test="creTime!=null and creTime!=''">
+                creTime=#{creTime},
+            </if>
+            <if test="delTime!=null and delTime!=''">
+                del_time=#{delTime}
+            </if>
+            <if test="extendId>-1">
+                extend_id=#{extendId}
+            </if>
+            <if test="fileSize>-1">
+                file_size=#{fileSize}
+            </if>
+        </set>
+        where file_id=#{fileId}
+    </update>
+
+    <!--修改文件夹-->
+    <update id="editProtfolio" parameterType="SysProtfolio">
+        update sys_protfolio
+        <set>
+            <if test="proName!=null and proName!=''">
+                pro_name=#{proName},
+            </if>
+            <if test="proStatus!=null and proStatus!=''">
+                pro_status=#{proStatus},
+            </if>
+            <if test="proPath!=null and proPath!=''">
+                pro_path=#{proPath},
+            </if>
+            <if test="parentId>-1">
+                parent_id=#{parentId},
+            </if>
+            <if test="modTime!=null and modTime!=''">
+                mod_time=#{modTime},
+            </if>
+            <if test="creTime!=null and creTime!=''">
+                creTime=#{creTime},
+            </if>
+            <if test="delTime!=null and delTime!=''">
+                del_time=#{delTime}
+            </if>
+            <if test="extendId>-1">
+                extend_id=#{extendId}
+            </if>
+            <if test="proSize>-1">
+                pro_size=#{proSize}
+            </if>
+        </set>
+        where pro_id=#{proId}
+    </update>
+
+    <!--批量删除文件-->
+    <delete id="delFile">
+        update sys_file set file_status='0'
+        where
+        <foreach collection="list" item="item" separator="," open="(" close=")" index="index">
+            (file_name=#{item.name} and file_path=#{item.path})
+        </foreach>
+    </delete>
+
+    <!--批量删除文件夹-->
+    <delete id="delProtfolio">
+        update sys_protfolio set pro_status='0'
+        where
+        <foreach collection="list" item="item" separator="," open="(" close=")" index="index">
+            (pro_name=#{item.name} and pro_path=#{item.path})
+        </foreach>
+    </delete>
 </mapper>

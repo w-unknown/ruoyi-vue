@@ -26,6 +26,23 @@
       </el-col>
       <!--用户数据-->
       <el-col :span="24" :xs="24">
+        <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="80px">
+          <el-form-item label="" prop="name">
+            <el-input
+              v-model="queryParams.name"
+              placeholder="请输入学生学号"
+              clearable
+              size="small"
+              style="width: 240px"
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-form>
         <!--<el-col :span="1.5">
             <el-button
               type="primary"
@@ -60,26 +77,48 @@
         </el-col>-->
         <el-col :span="1.5">
           <el-button
-            type="info"
+            type="primary"
             plain
             icon="el-icon-upload2"
             size="mini"
             @click="handleImport"
-            v-hasPermi="['system:file:import']"
-          >导入
+            v-hasPermi="['system:file:upload']"
+          >上传
           </el-button>
-        </el-col>
-        <!--<el-col :span="1.5">
           <el-button
             type="warning"
             plain
             icon="el-icon-download"
             size="mini"
-            @click="handleExport"
-            v-hasPermi="['system:grade:export']"
-          >导出</el-button>
+            @click="handleDownload"
+            v-hasPermi="['system:file:download']"
+          >下载</el-button>
+          <el-button
+            type="primary"
+            plain
+            size="mini"
+            @click="handProtfolio"
+            v-hasPermi="['system:file:add']"
+          >新建文件夹</el-button>
+          <el-button
+            type="primary"
+            plain
+            size="mini"
+            @click="handEdit"
+            v-hasPermi="['system:file:edit']"
+          >重命名</el-button>
+          <el-button
+            type="primary"
+            plain
+            size="mini"
+            @click="handDel"
+            v-hasPermi="['system:file:edit']"
+          >删除文件</el-button>
+        </el-col>
+        <!--<el-col :span="1.5">
+
         </el-col>-->
-        <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
+        <!--<right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>-->
         <!--<el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
           <el-form-item label="" prop="fileName">
             <el-input
@@ -98,7 +137,7 @@
           </el-form-item>
         </el-form>-->
 
-        <el-row>
+        <el-col>
           <div class="breadcrumb-wrapper">
             <div class="title">当前位置：</div>
             <el-input
@@ -129,15 +168,16 @@
                 <el-breadcrumb-item
                   v-for="(item, index) in breadCrumbList"
                   :key="index"
-                  style="line-height: 2;width:500px;"
+                  :to="{path :item.path}"
                 >{{ item.name }}</el-breadcrumb-item
                 >
               </el-breadcrumb>
             </div>
           </div>
-        </el-row>
+        </el-col>
         <div></div>
-
+      </el-col>
+      <el-col>
         <el-table v-loading="loading" :data="fileList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" v-if="checkRole(['admin'])" width="50" align="center"/>
           <el-table-column label="文件名" align="center" key="name" prop="name" v-if="columns[0].visible"
@@ -166,81 +206,29 @@
 
 
     <!-- 添加或修改用户配置对话框 -->
-    <!--    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
           <el-form ref="form" :model="form" :rules="rules" label-width="80px">
             <el-row>
               <el-col :span="12">
-                <el-form-item label="学生姓名" prop="name">
-                  <el-input v-model="form.name" :readonly="read" placeholder="请输入学生姓名" maxlength="30" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="语文成绩" prop="chinese">
-                  <el-input v-model="form.chinese" placeholder="请输入语文成绩" maxlength="30" />
+                <el-form-item label="文件名" prop="name">
+                  <el-input v-model="form.name" placeholder="请输入文件名" maxlength="30" />
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="英语成绩" prop="english">
-                  <el-input v-model="form.english" placeholder="请输入学生姓名" maxlength="30" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="数学成绩" prop="mathematics">
-                  <el-input v-model="form.mathematics" placeholder="请输入数学成绩" maxlength="30" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="历史成绩" prop="history">
-                  <el-input v-model="form.history" placeholder="请输入历史成绩" maxlength="30" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="生物成绩" prop="biology">
-                  <el-input v-model="form.biology" placeholder="请输入生物成绩" maxlength="30" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="化学成绩" prop="chemistry">
-                  <el-input v-model="form.chemistry" placeholder="请输入化学成绩" maxlength="30" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="物理成绩" prop="physics">
-                  <el-input v-model="form.physics" placeholder="请输入物理成绩" maxlength="30" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="地理成绩" prop="geography">
-                  <el-input v-model="form.geography" placeholder="请输入地理成绩" maxlength="30" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="政治成绩" prop="politics">
-                  <el-input v-model="form.politics" placeholder="请输入政治成绩" maxlength="30" />
-                </el-form-item>
-              </el-col>
-            </el-row>
+
           </el-form>
           <div slot="footer" class="dialog-footer" style="text-align: center">
             <el-button type="primary" @click="submitForm">确 定</el-button>
             <el-button @click="cancel">取 消</el-button>
           </div>
-        </el-dialog>-->
+        </el-dialog>
 
     <!--用户导入对话框 -->
     <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
       <el-upload
         ref="upload"
         :limit="1"
-        accept=".xlsx, .xls,.exe,.bat,.jpg,.png,.doc,docx"
+        accept=".xlsx, .xls,.exe,.bat,.jpg,.png,.doc,.docx,.txt,.java,.xml,.js,"
         :headers="upload.headers"
         :action="upload.url + '?updateSupport=' + upload.updateSupport"
         :disabled="upload.isUploading"
@@ -282,6 +270,7 @@
       return {
         fileType:'',
         filePath:'',
+        //动态面包屑路由集合
         breadCrumbList:[],
         fileTypeMap: {
           1: '全部图片',
@@ -334,7 +323,7 @@
           // 设置上传的请求头部
           headers: {Authorization: "Bearer " + getToken()},
           // 上传的地址
-          url: process.env.VUE_APP_BASE_API + "/system/file/importData"
+          url: process.env.VUE_APP_BASE_API + "/system/file/upload"
         },
         // 查询参数
         queryParams: {
@@ -358,6 +347,7 @@
       }
     },
     created() {
+
       this.getList('/');
     },
     methods: {
@@ -367,11 +357,11 @@
       /** 查询用户列表 */
       getList(pathVal) {
         this.loading = true;
-        this.queryParams.name = '';
         this.queryParams.path = pathVal;
         this.filePath=pathVal;
         this.fileType=0;
-        this.breadCrumbList=this.getPathArray();
+        this.getPathArray()
+        // this.breadCrumbList=this.getPathArray();
         listFile(this.queryParams).then(response => {
             console.log(response)
             this.fileList = response.rows;
@@ -411,7 +401,7 @@
             })
           }
         }
-        return res
+        // this.breadCrumbList=res;
       },
 
       /**
@@ -439,43 +429,44 @@
 
 
       // 取消按钮
-      /*cancel() {
+      cancel() {
         this.open = false;
         this.reset();
-      },*/
+      },
       // 表单重置
-      /*reset() {
+      reset() {
         this.form = {
-          id: undefined,
           name: undefined,
-          chinese: undefined,
-          english: undefined,
-          mathematics: undefined,
-          history: undefined,
-          biology: undefined,
-          chemistry: undefined,
-          physics: undefined,
-          geography: undefined,
-          politics: undefined,
         };
         this.resetForm("form");
-      },*/
+      },
       /** 搜索按钮操作 */
-      /*handleQuery() {
+      handleQuery() {
         this.queryParams.pageNum = 1;
-        this.getList();
-      },*/
+        if(this.inputFilePath!==this.filePath){
+          this.getList(this.inputFilePath);
+        }
+        if(this.inputFilePath===this.filePath){
+          this.getList(this.filePath)
+        }
+
+      },
       /** 重置按钮操作 */
-      /*resetQuery() {
+      resetQuery() {
         this.dateRange = [];
         this.resetForm("queryForm");
         this.handleQuery();
-      },*/
+      },
       // 多选框选中数据
       handleSelectionChange(selection) {
         this.ids = selection.map(item => item.id);
         this.single = selection.length != 1;
         this.multiple = !selection.length;
+      },
+      handProtfolio(){
+        this.reset();
+        this.open = true;
+        this.title = "新增文件夹";
       },
       /** 新增按钮操作 */
       /*handleAdd() {
@@ -486,7 +477,7 @@
         this.title = "添加学生成绩";
       },*/
       /** 修改按钮操作 */
-      /*handleUpdate(row) {
+      handleUpdate(row) {
         this.reset();
         const id = row.id || this.ids;
         getGrade(id).then(response => {
@@ -496,12 +487,12 @@
           this.open = true;
           this.title = "修改学生成绩";
         });
-      },*/
+      },
       /** 提交按钮 */
-      /*submitForm: function() {
+      submitForm: function() {
         this.$refs["form"].validate(valid => {
           if (valid) {
-            if (this.form.id != undefined) {
+            if (this.form.name != undefined) {
               updateGrade(this.form).then(response => {
                 this.$modal.msgSuccess("修改成功");
                 this.open = false;
@@ -516,7 +507,7 @@
             }
           }
         });
-      },*/
+      },
       /** 删除按钮操作 */
       /*handleDelete(row) {
         const delIds = row.id || this.ids;
@@ -539,10 +530,10 @@
         this.upload.open = true;
       },
       /** 下载模板操作 */
-      /*importTemplate() {
-        this.download('system/grade/importTemplate', {
-        }, `grade_template_${new Date().getTime()}.xlsx`)
-      },*/
+      importTemplate() {
+        this.download('system/file/download', {
+        }, `file_template_${new Date().getTime()}.xlsx`)
+      },
       // 文件上传中处理
       handleFileUploadProgress(event, file, fileList) {
         this.upload.isUploading = true;
@@ -563,31 +554,6 @@
   }
 </script>
 
-<style lang="scss" scoped>
+<style lang="sass" scoped>
 
-.breadcrumb-wrapper {
-  padding: 0;
-  height: 30px;
-  line-height: 30px;
-  display: flex;
-
-  .title,
-  >>> .el-breadcrumb {
-    height: 30px;
-    line-height: 30px;
-  }
-
-  .file-path-input {
-    flex: 1;
-    font-size: 14px;
-  }
-  .breadcrumb-box {
-    padding: 0 8px;
-    flex: 1;
-    display: flex;
-    &.able-input {
-      cursor: pointer;
-    }
-  }
-}
 </style>
